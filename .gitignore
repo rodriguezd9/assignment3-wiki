@@ -31,3 +31,9 @@ $RECYCLE.BIN/
 .vscode/
 .history/
 *.code-workspace
+/.idea/.gitignore
+/.idea/vcs.xml
+/.idea/jsLibraryMappings.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/misc.xml
