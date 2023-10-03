@@ -20,9 +20,10 @@ def save_entry(title, content):
     it is replaced.
     """
     filename = f"entries/{title}.md"
+    content = content.replace('\r\n', '\n').replace('\r', '\n')
     if default_storage.exists(filename):
-        default_storage.delete(filename)
-    default_storage.save(filename, ContentFile(content))
+        with default_storage.open(filename, 'w') as f:
+            f.write(content)
 
 
 def get_entry(title):
@@ -31,7 +32,13 @@ def get_entry(title):
     entry exists, the function returns None.
     """
     try:
-        f = default_storage.open(f"entries/{title}.md")
-        return f.read().decode("utf-8")
+        lowercase_title = title.lower()
+        all_entries = [entry.lower() for entry in default_storage.listdir("entries")[1]]
+
+        if f"{lowercase_title}.md" in all_entries:
+            f = default_storage.open(f"entries/{title}.md")
+            return f.read().decode("utf-8")
+        else:
+            return None
     except FileNotFoundError:
         return None
