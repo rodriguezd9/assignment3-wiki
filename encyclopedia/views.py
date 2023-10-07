@@ -50,31 +50,29 @@ def random_entry(request):
 
 def create_entry(request):
     entries = util.list_entries()
-    if request.method == 'POST':
-        form = NewEntryForm(request.POST)
-        if form.is_valid():
-            title = form.cleaned_data["title"]
-            content = form.cleaned_data["content"]
-            if util.get_entry(title) is None:
-                util.save_entry(title, content) # save the entry
-                messages.success(request, 'Entry created successfully!')
-                print(util.list_entries())  # check the entries when rendering the index page
-                print(util.get_entry(title))
-                
-                return render(request, "encyclopedia/index.html", {
-                    "title": title,
-                    "content": content,
-                    "entries": util.list_entries()
-                })
-                
-            else:
-                messages.error(request, 'Entry already exists!')
-                return redirect("index")
-        else:
-            return render(request, "encyclopedia/create_entry.html", {"form": form})
-    else:
+    if request.method != 'POST':
         return render(request, "encyclopedia/create_entry.html", {"form": NewEntryForm()})
-    
+
+    form = NewEntryForm(request.POST)
+    if not form.is_valid():
+        return render(request, "encyclopedia/create_entry.html", {"form": form})
+
+    title = form.cleaned_data["title"]
+    content = form.cleaned_data["content"]
+    if util.get_entry(title) is not None:
+        messages.error(request, 'Entry already exists!')
+        return redirect("index")
+
+    util.save_entry(title, content) # save the entry
+    messages.success(request, 'Entry created successfully!')
+    print(util.list_entries())  # check the entries when rendering the index page
+    print(util.get_entry(title))
+
+    return render(request, "encyclopedia/index.html", {
+        "title": title,
+        "content": content,
+        "entries": util.list_entries()
+    })
 
 
 def edit_entry(request, title):
@@ -88,11 +86,11 @@ def edit_entry(request, title):
 
 
 def save_entry(request, title):
-    if request.method == 'POST':
-        updated_content = request.POST.get('content')
-        util.save_entry(title, updated_content)
-        return redirect('entry', title=title)
-    else:
+    if request.method != 'POST':
         raise Http404("Invalid request method")
+
+    updated_content = request.POST.get('content')
+    util.save_entry(title, updated_content)
+    return redirect('entry', title=title)
 
 
