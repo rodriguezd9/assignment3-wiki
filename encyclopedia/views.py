@@ -4,9 +4,8 @@ from django.http import Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from . import util
-
 from django.http import HttpResponseRedirect
-from .forms import NewEntryForm
+from .forms import NewEntryForm, SearchForm
 from django.contrib import messages
 
 
@@ -65,9 +64,6 @@ def create_entry(request):
 
     util.save_entry(title, content) # save the entry
     messages.success(request, 'Entry created successfully!')
-    print(util.list_entries())  # check the entries when rendering the index page
-    print(util.get_entry(title))
-
     return render(request, "encyclopedia/index.html", {
         "title": title,
         "content": content,
@@ -94,3 +90,20 @@ def save_entry(request, title):
     return redirect('entry', title=title)
 
 
+def search(request):
+    if 'q' in request.GET:
+        query = request.GET['q']
+        entries = util.list_entries()
+        
+        # if query in entries:
+        matches = [entry for entry in entries if query.lower() in entry.lower()]
+
+    
+        # Check if there are no matches
+        if not matches:
+            messages.error(request, 'Nothing matches your search!')
+        
+        return render(request, "encyclopedia/search_results.html", {"matches": matches})
+    else:
+        messages.error(request, 'No search query provided!')
+        return render(request, "encyclopedia/search_results.html", {"form": SearchForm()})

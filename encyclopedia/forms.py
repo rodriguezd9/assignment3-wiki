@@ -3,13 +3,11 @@ from . import util
 
 class NewEntryForm(forms.Form):
     title = forms.CharField(label="Title")
-    content = forms.CharField(label="Content", widget=forms.Textarea)
+    content = forms.CharField(label="Enter content below in markdown", widget=forms.Textarea)
 
     def clean(self):
-        #WRONG: super(NewTaskForm, self.clean())
         super(NewEntryForm, self).clean()
         title = self.cleaned_data['title']
-        content = self.cleaned_data['content']
         
         if title in util.list_entries():
             raise forms.ValidationError("Entry already exists")
@@ -17,3 +15,5 @@ class NewEntryForm(forms.Form):
         return self.cleaned_data
 
 
+class SearchForm(forms.Form):
+        q = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Search Encyclopedia'}))
