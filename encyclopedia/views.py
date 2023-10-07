@@ -2,8 +2,12 @@ import random
 import markdown2
 from django.http import Http404
 from django.shortcuts import render, redirect
-
+from django.urls import reverse
 from . import util
+
+from django.http import HttpResponseRedirect
+from .forms import NewEntryForm
+from django.contrib import messages
 
 
 def index(request):
@@ -42,6 +46,35 @@ def random_entry(request):
                     "content": html_content
                 }
             })
+            
+
+def create_entry(request):
+    entries = util.list_entries()
+    if request.method == 'POST':
+        form = NewEntryForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            content = form.cleaned_data["content"]
+            if util.get_entry(title) is None:
+                util.save_entry(title, content) # save the entry
+                messages.success(request, 'Entry created successfully!')
+                print(util.list_entries())  # check the entries when rendering the index page
+                print(util.get_entry(title))
+                
+                return render(request, "encyclopedia/index.html", {
+                    "title": title,
+                    "content": content,
+                    "entries": util.list_entries()
+                })
+                
+            else:
+                messages.error(request, 'Entry already exists!')
+                return redirect("index")
+        else:
+            return render(request, "encyclopedia/create_entry.html", {"form": form})
+    else:
+        return render(request, "encyclopedia/create_entry.html", {"form": NewEntryForm()})
+    
 
 
 def edit_entry(request, title):
@@ -61,3 +94,5 @@ def save_entry(request, title):
         return redirect('entry', title=title)
     else:
         raise Http404("Invalid request method")
+
+
