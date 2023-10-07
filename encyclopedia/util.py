@@ -20,9 +20,8 @@ def save_entry(title, content):
     """
     filename = f"entries/{title}.md"
     content = content.replace('\r\n', '\n').replace('\r', '\n')
-    if default_storage.exists(filename):
-        with default_storage.open(filename, 'w') as f:
-            f.write(content)
+    with default_storage.open(filename, 'w') as f:
+        f.write(content)
 
 
 def get_entry(title):
