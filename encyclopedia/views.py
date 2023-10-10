@@ -1,12 +1,12 @@
 import random
+
 import markdown2
+from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import render, redirect
-from django.urls import reverse
+
 from . import util
-from django.http import HttpResponseRedirect
 from .forms import NewEntryForm, SearchForm
-from django.contrib import messages
 
 
 def index(request):
