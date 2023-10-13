@@ -27,25 +27,19 @@ def wiki(request, title):
         })
     else:
         return render(request, "encyclopedia/wiki.html", {
-            "title": title,
-            "content": f"Entry '{title}' not found"
+            "error_message": f"Entry '{title}' not found"
         })
 
 
+from random import randint
 def random_entry(request):
     entries = util.list_entries()
     if entries:
-        random_entry_name = random.choice(entries)
-        random_entry_content = util.get_entry(random_entry_name)
-        if random_entry_content is not None:
-            html_content = markdown2.markdown(random_entry_content)
-            return render(request, "encyclopedia/random_entry.html", {
-                "entry": {
-                    "title": random_entry_name,
-                    "content": html_content
-                }
-            })
-            
+        random_title = entries[randint(0, len(entries)-1)]
+        return redirect('entry', title=random_title)
+    else:
+        return redirect('index')
+
 
 def create_entry(request):
     entries = util.list_entries()
@@ -64,11 +58,12 @@ def create_entry(request):
 
     util.save_entry(title, content) # save the entry
     messages.success(request, 'Entry created successfully!')
-    return render(request, "encyclopedia/index.html", {
-        "title": title,
-        "content": content,
-        "entries": util.list_entries()
-    })
+    return redirect('index')
+    # return render(request, "encyclopedia/index.html", {
+    #     "title": title,
+    #     "content": content,
+    #     "entries": util.list_entries()
+    # })
 
 
 def edit_entry(request, title):

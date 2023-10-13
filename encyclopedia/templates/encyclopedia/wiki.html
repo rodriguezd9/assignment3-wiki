@@ -1,10 +1,14 @@
 {% extends "encyclopedia/layout.html" %}
 
 {% block body %}
+    {% if error_message %}
+        <p>{{ error_message }}</p>
+    {% else %}
     <div>
         {{ content|safe }}
     </div>
     <div>
             <a href="{% url 'edit_entry' title %}">Edit Page</a>
     </div>
+    {% endif %}
 {% endblock %}
